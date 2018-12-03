@@ -3,6 +3,9 @@
 namespace Phalcon\Cashier;
 
 use Carbon\Carbon;
+use Exception;
+use Baka\Auth\Models\Companies;
+use Baka\Auth\Models\Apps;
 
 class SubscriptionBuilder
 {
@@ -62,6 +65,20 @@ class SubscriptionBuilder
     protected $metadata;
 
     /**
+     * Company
+     *
+     * @var Company
+     */
+    protected $company;
+
+    /**
+     * App
+     *
+     * @var Apps
+     */
+    protected $apps;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $user
@@ -69,11 +86,13 @@ class SubscriptionBuilder
      * @param  string  $plan
      * @return void
      */
-    public function __construct($user, $name, $plan)
+    public function __construct($user, $name, $plan, Companies $company, Apps $apps)
     {
         $this->user = $user;
         $this->name = $name;
         $this->plan = $plan;
+        $this->company = $company;
+        $this->apps = $apps;
     }
 
     /**
@@ -170,18 +189,25 @@ class SubscriptionBuilder
             $object = Carbon::now()->addDays($this->trialDays);
             $trialEndsAt = $this->trialDays ? $object->toDateTimeString() : null;
         }
+
         $object = new Subscription();
         $object->name = $this->name;
         $object->stripe_id = $subscription->id;
         $object->stripe_plan = $this->plan;
         $object->quantity = $this->quantity;
         $object->trial_ends_at = $trialEndsAt;
+        $object->company_id = $this->company->getId();
+        $object->apps_id = $this->apps->getId();
 
         //Need call it before save relationship
         $this->user->subscriptions();
         $this->user->subscriptions = $object;
-        return $this->user->save();
 
+        if (!$this->user->save()) {
+            throw new Exception((string) current($this->user->getMessages()));
+        }
+
+        return $this->user;
     }
 
     /**
@@ -193,7 +219,7 @@ class SubscriptionBuilder
      */
     protected function getStripeCustomer($token = null, array $options = [])
     {
-        if (! $this->user->stripe_id) {
+        if (!$this->user->stripe_id) {
             $customer = $this->user->createAsStripeCustomer(
                 $token,
                 array_merge($options, array_filter(['coupon' => $this->coupon]))

@@ -12,7 +12,6 @@
 use Phalcon\DI;
 use Phalcon\Crypt;
 use Phalcon\Security;
-use Phalcon\Mvc\Router;
 use Phalcon\Flash\Session;
 use Phalcon\DI\FactoryDefault;
 use Phalcon\Http\Response\Cookies;
@@ -30,8 +29,6 @@ use Phalcon\Mvc\Model\Manager          as ModelsManager;
 use Phalcon\Events\Manager             as EventsManager;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\View\Engine\Volt;
-use Phalcon\Queue\Beanstalk;
-use Phalcon\Config\Adapter\Php        as AdapterPhp;
 use Phalcon\Logger\Adapter\File as FileLogger;
 use Phalcon\Mvc\Model\Metadata\Redis as MetadataRedis;
 use Phalcon\Security\Random;
@@ -42,12 +39,11 @@ use App\Utils\App as UtilsApp;
 use App\Markdown\ParsedownExtra;
 use App\Filesystem\FlysystemServiceProvider;
 
-
-
 /**
  * The FactoryDefault Dependency Injector automatically register the right services providing a full stack framework
  */
 $di = new FactoryDefault();
+
 
 // Create an event manager
 $eventsManager = new EventsManager();
@@ -66,7 +62,6 @@ if (file_exists(__DIR__ . '/config.' . APPLICATION_ENV . '.php')) {
     $config->merge($overrideConfig);
 }
 $di->set('config', $config, true);
-
 
 /**
  * The URL component is used to generate all kind of urls in the application
@@ -93,7 +88,7 @@ $di->set(
     'session',
     function () use ($di) {
         $sessionAdapter = $di->get('config')->application->session->adapter;
-        $session        = new $sessionAdapter($di->get('config')->application->session->options->toArray());
+        $session = new $sessionAdapter($di->get('config')->application->session->options->toArray());
         $session->start();
 
         return $session;
@@ -138,13 +133,12 @@ $di->set(
                 $frontCache,
                 [
                     'cacheDir' => $config->cache->cacheDir,
-                    'prefix'   => $config->cache->prefix
+                    'prefix' => $config->cache->prefix
                 ]
             );
         }
     }
 );
-
 
 // Register the flash service with custom CSS classes
 $di->set(
@@ -152,9 +146,9 @@ $di->set(
     function () {
         $flash = new Session(
             [
-                'error'   => 'alert alert-danger',
+                'error' => 'alert alert-danger',
                 'success' => 'alert alert-success',
-                'notice'  => 'alert alert-info',
+                'notice' => 'alert alert-info',
                 'warning' => 'alert alert-warning'
             ]
         );
@@ -169,10 +163,10 @@ $di->set(
     function () use ($di) {
         $connection = new Mysql(
             [
-                'host'     => $di->get('config')->database->mysql->host,
+                'host' => $di->get('config')->database->mysql->host,
                 'username' => $di->get('config')->database->mysql->username,
                 'password' => $di->get('config')->database->mysql->password,
-                'dbname'   => $di->get('config')->database->mysql->dbname,
+                'dbname' => $di->get('config')->database->mysql->dbname,
                 //'schema'   => $di->get('config')->database->mysql->schema,
                 // 'options'  => [
                 //   //  \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $di->get('config')->database->mysql->charset
@@ -231,7 +225,6 @@ $di->set(
 $di->set(
     'security',
     function () {
-
         $security = new Security();
         //Set the password hashing factor to 12 rounds
         $security->setWorkFactor(12);
@@ -299,7 +292,6 @@ $di->set(
     }
 );
 
-
 //Translation application
 $di->set(
     'translation',
@@ -319,8 +311,8 @@ $di->set(
 );
 $di->set(
     'language',
-    function() use ($di, $config) {
-        $cookies  = $di->get('cookies');
+    function () use ($di, $config) {
+        $cookies = $di->get('cookies');
         $language = $config->defaultLang;
         if ($cookies->has('language')) {
             $language = $cookies->get('language');
@@ -331,8 +323,8 @@ $di->set(
 );
 $di->set(
     'currency',
-    function() use ($di, $config) {
-        $cookies  = $di->get('cookies');
+    function () use ($di, $config) {
+        $cookies = $di->get('cookies');
         $currency = $config->currency;
         if ($cookies->has('currency')) {
             $currency = unserialize($cookies->get('currency'));
@@ -350,7 +342,7 @@ $di->set(
 );
 $di->set(
     'random',
-    function ()  {
+    function () {
         return new Random();
     }
 );
@@ -380,10 +372,10 @@ $di->set(
         $volt = new Volt($view);
         $volt->setOptions(
             [
-                'compiledPath'      => $config->application->view->compiledPath,
+                'compiledPath' => $config->application->view->compiledPath,
                 'compiledSeparator' => $config->application->view->compiledSeparator,
                 'compiledExtension' => $config->application->view->compiledExtension,
-                'compileAlways'     => true,
+                'compileAlways' => true,
             ]
         );
         $compiler = $volt->getCompiler();
@@ -399,7 +391,7 @@ $di->set(
 $di->set(
     'logger',
     function () use ($di) {
-        $logger = ROOT_DIR. 'logs/' . date('Y-m-d') . '.log';
+        $logger = ROOT_DIR . 'logs/' . date('Y-m-d') . '.log';
         return new FileLogger($logger, ['model' => 'a+']);
     },
     true

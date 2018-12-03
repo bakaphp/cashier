@@ -5,9 +5,7 @@ namespace Phalcon\Cashier;
 use Carbon\Carbon;
 use LogicException;
 use DateTimeInterface;
-use Phalcon\Mvc\Model;
-use Exception;
-use Phalcon\Di\FactoryDefault;
+use Baka\Database\Model;
 
 class Subscription extends Model
 {
@@ -42,19 +40,22 @@ class Subscription extends Model
      */
     protected $billingCycleAnchor = null;
 
+    public function initialize()
+    {
+        $this->belongsTo('user_id', '\App\Models\Users', 'id', ['alias' => 'user']);
+    }
+
+    public function getSource()
+    {
+        return 'subscriptions';
+    }
+
     /**
      * Get the user that owns the subscription.
      */
     public function user()
     {
-        $di     = FactoryDefault::getDefault();
-        $stripe = $di->getConfig()->stripe;
-        $model  = $stripe->model ?: getenv('STRIPE_MODEL');
-        if (!isset($model)) {
-            throw new Exception('You need add config model for stripe!');
-        }
-        $this->belongsTo('user_id', $model, 'id', ['alias' => 'user']);
-        return $this->getRelated('user');
+        return $this->user;
     }
 
     /**
@@ -84,7 +85,7 @@ class Subscription extends Model
      */
     public function cancelled()
     {
-        return ! is_null($this->ends_at);
+        return !is_null($this->ends_at);
     }
 
     /**
@@ -94,7 +95,7 @@ class Subscription extends Model
      */
     public function onTrial()
     {
-        if (! is_null($this->trial_ends_at)) {
+        if (!is_null($this->trial_ends_at)) {
             $trialEndsAt = new \DateTime($this->trial_ends_at);
             return Carbon::today()->lt(Carbon::instance($trialEndsAt));
         } else {
@@ -224,7 +225,9 @@ class Subscription extends Model
 
         $subscription->prorate = $this->prorate;
 
-        if (! is_null($this->billingCycleAnchor)) {
+        $subscription->cancel_at_period_end = false;
+
+        if (!is_null($this->billingCycleAnchor)) {
             $subscription->billingCycleAnchor = $this->billingCycleAnchor;
         }
 
@@ -267,16 +270,7 @@ class Subscription extends Model
 
         $subscription->cancel(['at_period_end' => true]);
 
-        // If the user was on trial, we will set the grace period to end when the trial
-        // would have ended. Otherwise, we'll retrieve the end of the billing period
-        // period and make that the end of the grace period for this current user.
-        if ($this->onTrial()) {
-            $this->ends_at = $this->trial_ends_at;
-        } else {
-            $object = Carbon::createFromTimestamp($subscription->current_period_end);
-            $this->ends_at = $object->toDateTimeString() ;
-
-        }
+        $this->markAsCancelled();
 
         $this->save();
 
@@ -318,11 +312,13 @@ class Subscription extends Model
      */
     public function resume()
     {
-        if (! $this->onGracePeriod()) {
+        if (!$this->onGracePeriod()) {
             throw new LogicException('Unable to resume subscription that is not within grace period.');
         }
 
         $subscription = $this->asStripeSubscription();
+
+        $subscription->cancel_at_period_end = false;
 
         // To resume the subscription we need to set the plan parameter on the Stripe
         // subscription object. This will force Stripe to resume this subscription
@@ -345,6 +341,18 @@ class Subscription extends Model
     }
 
     /**
+     * Sync the tax percentage of the user to the subscription.
+     *
+     * @return void
+     */
+    public function syncTaxPercentage()
+    {
+        $subscription = $this->asStripeSubscription();
+        $subscription->tax_percent = $this->user->taxPercentage();
+        $subscription->save();
+    }
+
+    /**
      * Get the subscription as a Stripe subscription object.
      *
      * @return \Stripe\Subscription
@@ -353,9 +361,5 @@ class Subscription extends Model
     {
         $user = $this->user();
         return $user->asStripeCustomer()->subscriptions->retrieve($this->stripe_id);
-    }
-    public function getSource()
-    {
-        return 'subscriptions';
     }
 }

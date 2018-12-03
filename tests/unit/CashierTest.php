@@ -3,28 +3,26 @@
 use Carbon\Carbon;
 use App\Models\Users;
 use Phalcon\Cashier\Subscription;
+use App\Models\Companies;
+use App\Models\Apps;
 
 require_once 'UnitTestCase.php';
 
-
-
-
 class CashierTest extends \UnitTestCase
 {
-
     /**
      * Tests.
      */
     public function testSubscriptionsCanBeCreated()
     {
-
-
-        $user = Users::findFirst();
+        $user = Users::findFirst(2);
+        $company = Companies::findFirst(1);
+        $apps = Apps::findFirst(1);
 
         //Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')->create($this->getTestToken());
+        $user->newSubscription('main', 'monthly-10-1', $company, $apps)->create($this->getTestToken());
 
-        $this->assertEquals(1, count($user->subscriptions));
+        //$this->assertEquals(1, count($user->subscriptions));
         $this->assertNotNull($user->subscription('main')->stripe_id);
 
         $this->assertTrue($user->subscribed('main'));
@@ -37,11 +35,11 @@ class CashierTest extends \UnitTestCase
         $this->assertFalse($user->subscription('main')->cancelled());
         $this->assertFalse($user->subscription('main')->onGracePeriod());
 
-         //Cancel Subscription
+        //Cancel Subscription
         $subscription = $user->subscription('main');
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->cancelled());
         $this->assertTrue($subscription->onGracePeriod());
 
@@ -49,7 +47,6 @@ class CashierTest extends \UnitTestCase
         $oldGracePeriod = $subscription->ends_at;
         $subscription->ends_at = Carbon::now()->subDays(5)->toDateTimeString();
         $subscription->save();
-
 
         $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->cancelled());
@@ -86,15 +83,16 @@ class CashierTest extends \UnitTestCase
         $this->assertFalse($invoice->hasStartingBalance());
         $this->assertNull($invoice->coupon());
         $this->assertInstanceOf(Carbon::class, $invoice->date());
-
     }
 
-    public function test_creating_subscription_with_coupons()
+    public function testCreatingSubscriptionWithCoupons()
     {
-       $user = Users::findFirst();
+        $user = Users::findFirst(2);
+        $company = Companies::findFirst(1);
+        $apps = Apps::findFirst(1);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', 'monthly-10-1', $company, $apps)
                 ->withCoupon('coupon-1')->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
@@ -115,7 +113,7 @@ class CashierTest extends \UnitTestCase
         $this->assertFalse($invoice->discountIsPercentage());
     }
 
-    public function test_generic_trials()
+    public function testGenericTrials()
     {
 //        $user = new Users;
 //        $this->assertFalse($user->onGenericTrial());
@@ -125,12 +123,14 @@ class CashierTest extends \UnitTestCase
 //        $this->assertFalse($user->onGenericTrial());
     }
 
-    public function test_creating_subscription_with_trial()
+    public function testCreatingSubscriptionWithTrial()
     {
-        $user = Users::findFirst();
+        $user = Users::findFirst(2);
+        $company = Companies::findFirst(1);
+        $apps = Apps::findFirst(1);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', 'monthly-10-1', $company, $apps)
             ->trialDays(7)->create($this->getTestToken());
 
         $subscription = $user->subscription('main');
@@ -143,7 +143,7 @@ class CashierTest extends \UnitTestCase
         // Cancel Subscription
         $subscription->cancel();
 
-        $this->assertTrue($subscription->active());
+        $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->onGracePeriod());
 
         // Resume Subscription
@@ -156,12 +156,14 @@ class CashierTest extends \UnitTestCase
         $this->assertEquals(Carbon::today()->addDays(7)->day, $dt->day);
     }
 
-    public function test_applying_coupons_to_existing_customers()
+    public function testApplyingCouponsToExistingCustomers()
     {
-        $user = Users::findFirst();
+        $user = Users::findFirst(2);
+        $company = Companies::findFirst(1);
+        $apps = Apps::findFirst(1);
 
         // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1')
+        $user->newSubscription('main', 'monthly-10-1', $company, $apps)
                 ->create($this->getTestToken());
 
         $user->applyCoupon('coupon-1');
@@ -171,11 +173,9 @@ class CashierTest extends \UnitTestCase
         $this->assertEquals('coupon-1', $customer->discount->coupon->id);
     }
 
-
-
     public function testCreatingOneOffInvoices()
     {
-        $user = Users::findFirst();
+        $user = Users::findFirst(2);
 
         // Create Invoice
         $user->createAsStripeCustomer($this->getTestToken());
@@ -189,7 +189,7 @@ class CashierTest extends \UnitTestCase
 
     public function testRefunds()
     {
-        $user = Users::findFirst();
+        $user = Users::findFirst(2);
 
         // Create Invoice
         $user->createAsStripeCustomer($this->getTestToken());
@@ -214,11 +214,8 @@ class CashierTest extends \UnitTestCase
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
     }
 
-
     protected function connection()
     {
         return ;
     }
 }
-
-

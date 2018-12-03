@@ -2,7 +2,6 @@
 
 class UnitTestCase extends \Codeception\TestCase\Test
 {
-
     /**
      * @var \UnitTester
      */
@@ -10,12 +9,10 @@ class UnitTestCase extends \Codeception\TestCase\Test
 
     protected function _before()
     {
-        $this->di= $this->getModule('Phalcon2')->di;
-
+        $this->di = $this->getModule('Phalcon2')->di;
     }
 
     protected function _after()
     {
-
     }
 }

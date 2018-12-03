@@ -1,12 +1,13 @@
 <?php
+
 use Phalcon\Mvc\Application;
+use Dotenv\Dotenv;
 
 error_reporting(E_ALL);
 ini_set('memory_limit', '-1');
 
-
 if (!defined('ROOT_DIR')) {
-    define('ROOT_DIR', dirname(__DIR__) .'/');
+    define('ROOT_DIR', dirname(__DIR__) . '/');
 }
 if (!defined('APPLICATION_ENV')) {
     define('APPLICATION_ENV', (getenv('APPLICATION_ENV') ? getenv('APPLICATION_ENV') : 'local'));
@@ -14,16 +15,19 @@ if (!defined('APPLICATION_ENV')) {
 
 require_once ROOT_DIR . 'vendor/autoload.php';
 
+// Load environment
+(new Dotenv('.'))->overload();
+
 $loader = new \Phalcon\Loader();
 $loader->registerNamespaces(
     [
-        'Phalcon\Cashier'           => ROOT_DIR . 'src',
-        'App\Models'                => ROOT_DIR . 'tests/models'
+        'Phalcon\Cashier' => ROOT_DIR . 'src',
+        'App\Models' => ROOT_DIR . 'tests/models'
     ]
 );
 
 $loader->register();
 
-include  ROOT_DIR . 'tests/service.phalcon.php';
+include ROOT_DIR . 'tests/service.phalcon.php';
 
 return new Application($di);
