@@ -45,7 +45,7 @@ class Subscription extends Model
         $this->belongsTo('user_id', '\App\Models\Users', 'id', ['alias' => 'user']);
     }
 
-    public function getSource()
+    public function getSource(): string
     {
         return 'subscriptions';
     }
