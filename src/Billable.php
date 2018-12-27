@@ -15,7 +15,7 @@ use Stripe\InvoiceItem as StripeInvoiceItem;
 use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Baka\Auth\Models\Companies;
+use Phalcon\Mvc\Model;
 use Baka\Auth\Models\Apps;
 
 trait Billable
@@ -126,7 +126,7 @@ trait Billable
      * @param string $subscription
      * @param string $plan
      */
-    public function newSubscription($subscription, $plan, Companies $company, Apps $apps)
+    public function newSubscription($subscription, $plan, Model $company, Apps $apps)
     {
         return new SubscriptionBuilder($this, $subscription, $plan, $company, $apps);
     }
