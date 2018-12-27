@@ -4,7 +4,7 @@ namespace Phalcon\Cashier;
 
 use Carbon\Carbon;
 use Exception;
-use Baka\Auth\Models\Companies;
+use Phalcon\Mvc\Model;
 use Baka\Auth\Models\Apps;
 
 class SubscriptionBuilder
@@ -86,7 +86,7 @@ class SubscriptionBuilder
      * @param  string  $plan
      * @return void
      */
-    public function __construct($user, $name, $plan, Companies $company, Apps $apps)
+    public function __construct($user, $name, $plan, Model $company, Apps $apps)
     {
         $this->user = $user;
         $this->name = $name;
@@ -196,7 +196,7 @@ class SubscriptionBuilder
         $object->stripe_plan = $this->plan;
         $object->quantity = $this->quantity;
         $object->trial_ends_at = $trialEndsAt;
-        $object->company_id = $this->company->getId();
+        $object->companies_id = $this->company->getId();
         $object->apps_id = $this->apps->getId();
 
         //Need call it before save relationship
