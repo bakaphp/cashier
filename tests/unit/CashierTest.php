@@ -13,7 +13,7 @@ class CashierTest extends \UnitTestCase
     /**
      * Tests.
      */
-    public function testSubscriptionsCanBeCreated()
+    public function testSubscriptionsCanBeCreatedAndUpdated()
     {
         $user = Users::findFirst(2);
         $company = Companies::findFirst(1);
@@ -41,86 +41,12 @@ class CashierTest extends \UnitTestCase
 
         $this->assertFalse($subscription->active());
         $this->assertTrue($subscription->cancelled());
-        $this->assertTrue($subscription->onGracePeriod());
-
-        // Modify Ends Date To Past
-        $oldGracePeriod = $subscription->ends_at;
-        $subscription->ends_at = Carbon::now()->subDays(5)->toDateTimeString();
-        $subscription->save();
-
-        $this->assertFalse($subscription->active());
-        $this->assertTrue($subscription->cancelled());
         $this->assertFalse($subscription->onGracePeriod());
 
-        $subscription->ends_at = $oldGracePeriod;
-        $subscription->save();
-
-        // Resume Subscription
-        $subscription->resume();
-
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-
-        // Increment & Decrement
-        $subscription->incrementQuantity();
-
-        $this->assertEquals(2, $subscription->quantity);
-
-        $subscription->decrementQuantity();
-
-        $this->assertEquals(1, $subscription->quantity);
-
-        // Swap Plan
+        // Update current plan
         $subscription->swap('monthly-10-2');
 
         $this->assertEquals('monthly-10-2', $subscription->stripe_plan);
-
-        // Invoice Tests
-        $invoice = $user->invoices()[1];
-        $this->assertEquals('$10.00', $invoice->total());
-        $this->assertFalse($invoice->hasDiscount());
-        $this->assertFalse($invoice->hasStartingBalance());
-        $this->assertNull($invoice->coupon());
-        $this->assertInstanceOf(Carbon::class, $invoice->date());
-    }
-
-    public function testCreatingSubscriptionWithCoupons()
-    {
-        $user = Users::findFirst(2);
-        $company = Companies::findFirst(1);
-        $apps = Apps::findFirst(1);
-
-        // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1', $company, $apps)
-                ->withCoupon('coupon-1')->create($this->getTestToken());
-
-        $subscription = $user->subscription('main');
-
-        $this->assertTrue($user->subscribed('main'));
-        $this->assertTrue($user->subscribed('main', 'monthly-10-1'));
-        $this->assertFalse($user->subscribed('main', 'monthly-10-2'));
-        $this->assertTrue($subscription->active());
-        $this->assertFalse($subscription->cancelled());
-        $this->assertFalse($subscription->onGracePeriod());
-
-        // Invoice Tests
-        $invoice = $user->invoices()[0];
-
-        $this->assertTrue($invoice->hasDiscount());
-        $this->assertEquals('$5.00', $invoice->total());
-        $this->assertEquals('$5.00', $invoice->amountOff());
-        $this->assertFalse($invoice->discountIsPercentage());
-    }
-
-    public function testGenericTrials()
-    {
-//        $user = new Users;
-//        $this->assertFalse($user->onGenericTrial());
-//        $user->trial_ends_at = Carbon::tomorrow();
-//        $this->assertTrue($user->onGenericTrial());
-//        $user->trial_ends_at = Carbon::today()->subDays(5);
-//        $this->assertFalse($user->onGenericTrial());
     }
 
     public function testCreatingSubscriptionWithTrial()
@@ -144,33 +70,7 @@ class CashierTest extends \UnitTestCase
         $subscription->cancel();
 
         $this->assertFalse($subscription->active());
-        $this->assertTrue($subscription->onGracePeriod());
-
-        // Resume Subscription
-        $subscription->resume();
-
-        $this->assertTrue($subscription->active());
         $this->assertFalse($subscription->onGracePeriod());
-        $this->assertTrue($subscription->onTrial());
-        $dt = Carbon::parse($subscription->trial_ends_at);
-        $this->assertEquals(Carbon::today()->addDays(7)->day, $dt->day);
-    }
-
-    public function testApplyingCouponsToExistingCustomers()
-    {
-        $user = Users::findFirst(2);
-        $company = Companies::findFirst(1);
-        $apps = Apps::findFirst(1);
-
-        // Create Subscription
-        $user->newSubscription('main', 'monthly-10-1', $company, $apps)
-                ->create($this->getTestToken());
-
-        $user->applyCoupon('coupon-1');
-
-        $customer = $user->asStripeCustomer();
-
-        $this->assertEquals('coupon-1', $customer->discount->coupon->id);
     }
 
     public function testCreatingOneOffInvoices()
@@ -212,10 +112,5 @@ class CashierTest extends \UnitTestCase
                 'cvc' => '123',
             ],
         ], ['api_key' => getenv('STRIPE_SECRET')])->id;
-    }
-
-    protected function connection()
-    {
-        return ;
     }
 }
