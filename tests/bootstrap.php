@@ -22,7 +22,8 @@ $loader = new \Phalcon\Loader();
 $loader->registerNamespaces(
     [
         'Phalcon\Cashier' => ROOT_DIR . 'src',
-        'App\Models' => ROOT_DIR . 'tests/models'
+        'App\Models' => ROOT_DIR . 'tests/models',
+        'Phalcon\Cashier\Controllers' => 'src/Http/Controllers'
     ]
 );
 
