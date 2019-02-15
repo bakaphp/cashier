@@ -79,6 +79,13 @@ class SubscriptionBuilder
     protected $apps;
 
     /**
+     * Active Subscription Id
+     *
+     * @var string
+     */
+    protected $activeSubscriptionId;
+
+    /**
      * Create a new subscription builder instance.
      *
      * @param  mixed  $user
@@ -196,12 +203,13 @@ class SubscriptionBuilder
         $object->stripe_plan = $this->plan;
         $object->quantity = $this->quantity;
         $object->trial_ends_at = $trialEndsAt;
-        $object->company_id = $this->company->getId();
+        $object->companies_id = $this->company->getId();
         $object->apps_id = $this->apps->getId();
 
         //Need call it before save relationship
         $this->user->subscriptions();
         $this->user->subscriptions = $object;
+        $this->setActiveSubscriptionId($subscription->id);
 
         if (!$this->user->save()) {
             throw new Exception((string) current($this->user->getMessages()));
@@ -278,5 +286,24 @@ class SubscriptionBuilder
         if ($taxPercentage = $this->user->taxPercentage()) {
             return $taxPercentage;
         }
+    }
+
+    /**
+     * Set Active Subscription Id value
+     * @param string $id
+     * @return void
+     */
+    protected function setActiveSubscriptionId(string $id): void
+    {
+        $this->activeSubscriptionId =  $id;
+    }
+
+    /**
+     * Get Active Subscription Id value
+     * @return string
+     */
+    protected function getActiveSubscriptionId(): string
+    {
+        return $this->activeSubscriptionId;
     }
 }
