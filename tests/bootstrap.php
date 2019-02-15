@@ -23,7 +23,7 @@ $loader->registerNamespaces(
     [
         'Phalcon\Cashier' => ROOT_DIR . 'src',
         'App\Models' => ROOT_DIR . 'tests/models',
-        'Phalcon\Cashier\Controllers' => 'src/Http/Controllers'
+        'Phalcon\Cashier\Controllers' => ROOT_DIR . 'src/Http/Controllers'
     ]
 );
 
