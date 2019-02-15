@@ -196,7 +196,7 @@ class SubscriptionBuilder
         $object->stripe_plan = $this->plan;
         $object->quantity = $this->quantity;
         $object->trial_ends_at = $trialEndsAt;
-        $object->companies_id = $this->company->getId();
+        $object->company_id = $this->company->getId();
         $object->apps_id = $this->apps->getId();
 
         //Need call it before save relationship
