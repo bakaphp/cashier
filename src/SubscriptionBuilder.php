@@ -209,7 +209,7 @@ class SubscriptionBuilder
         //Need call it before save relationship
         $this->user->subscriptions();
         $this->user->subscriptions = $object;
-        $this->setActiveSubscriptionId($subscription->id);
+        $this->user->activeSubscriptionId = $subscription->id;
 
         if (!$this->user->save()) {
             throw new Exception((string) current($this->user->getMessages()));
@@ -286,24 +286,5 @@ class SubscriptionBuilder
         if ($taxPercentage = $this->user->taxPercentage()) {
             return $taxPercentage;
         }
-    }
-
-    /**
-     * Set Active Subscription Id value
-     * @param string $id
-     * @return void
-     */
-    protected function setActiveSubscriptionId(string $id): void
-    {
-        $this->activeSubscriptionId =  $id;
-    }
-
-    /**
-     * Get Active Subscription Id value
-     * @return string
-     */
-    protected function getActiveSubscriptionId(): string
-    {
-        return $this->activeSubscriptionId;
     }
 }
