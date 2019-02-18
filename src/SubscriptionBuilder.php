@@ -209,7 +209,7 @@ class SubscriptionBuilder
         //Need call it before save relationship
         $this->user->subscriptions();
         $this->user->subscriptions = $object;
-        $this->user->activeSubscriptionId = $subscription->id;
+        $this->user->active_subscription_id = $subscription->id;
 
         if (!$this->user->save()) {
             throw new Exception((string) current($this->user->getMessages()));
