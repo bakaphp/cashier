@@ -21,10 +21,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "1.*",
-        "codeception/codeception": "^2.4",
-        "baka/auth": "^0.1",
-        "baka/database": "~0.1",
-        "vlucas/phpdotenv": "^2.4"
+        "codeception/codeception": "^2.4"
     },
     "autoload": {
         "psr-4": {
