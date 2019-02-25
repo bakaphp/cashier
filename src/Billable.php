@@ -639,4 +639,20 @@ trait Billable
         }
         return false;
     }
+
+    /**
+     * Update default payment method with new card
+     * @param string $customerId
+     * @param string $token
+     * @return StripeCustomer
+     */
+    public function updatePaymentMethod(string $customerId, string $token)
+    {
+        $customer = StripeCustomer::update($customerId, ['source' => $token]);
+
+        if (is_object($customer)) {
+            return $customer;
+        }
+        return false;
+    }
 }
