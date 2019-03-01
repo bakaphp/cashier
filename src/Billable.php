@@ -648,7 +648,7 @@ trait Billable
      */
     public function updatePaymentMethod(string $customerId, string $token)
     {
-        $customer = StripeCustomer::update($customerId, ['source' => $token]);
+        $customer = StripeCustomer::update($customerId, ['source' => $token], $this->getStripeKey());
 
         if (is_object($customer)) {
             return $customer;
