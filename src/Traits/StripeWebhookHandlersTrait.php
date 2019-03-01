@@ -4,6 +4,7 @@ namespace Phalcon\Cashier\Traits;
 
 use Phalcon\Http\Response;
 use Exception;
+use Baka\Auth\Models\Users;
 
 /**
  * Trait WebhookHandlers
