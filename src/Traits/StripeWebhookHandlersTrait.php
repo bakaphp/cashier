@@ -22,7 +22,7 @@ trait StripeWebhookHandlersTrait
      *
      * @return Response
      */
-    protected function handleWebhook(): Response
+    public function handleWebhook(): Response
     {
         //we cant processs if we dont find the stripe header
         if (!$this->request->hasHeader('Stripe-Signature')) {
