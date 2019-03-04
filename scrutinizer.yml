@@ -44,7 +44,6 @@ build:
     dependencies:
         before:
           - cd /home/scrutinizer/build
-          - cd /home/scrutinizer/build
           -
             command: 'cd ~/ && rm -rf cphalcon && git clone -b 3.4.x -q --depth=1 https://github.com/phalcon/cphalcon.git && cd cphalcon/build && ./install'
           -
@@ -53,6 +52,7 @@ build:
           - sed -i '$ a \\n[Phalcon]\nextension=phalcon.so\n' /home/scrutinizer/.phpenv/versions/7.2.13/etc/php.ini
           - php -m | grep -i Phalcon
           - sudo /etc/init.d/apache2 restart
+          - cd /home/scrutinizer/build
           - composer install --no-interaction
           - composer update --no-interaction
           - ./vendor/bin/codecept build
