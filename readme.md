@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/duythien/cashier.svg?branch=master)](https://travis-ci.org/duythien/cashier) [![Slack](https://img.shields.io/badge/slack-join%20chat%20%E2%86%92-brightgreen.svg?style=flat-square)](http://chat.phalcontip.com)
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bakaphp/cashier/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bakaphp/cashier/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/bakaphp/cashier/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bakaphp/cashier/?branch=master)
+[![Build Status](https://scrutinizer-ci.com/g/bakaphp/cashier/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bakaphp/cashier/build-status/master)
+
 ## Introduction
 
 Phalcon Cashier provides an expressive, fluent interface to [Stripe's](https://stripe.com) subscription billing services. It handles almost all of the boilerplate subscription billing code you are dreading writing. In addition to basic subscription management, Cashier can handle coupons, swapping subscription, subscription "quantities", cancellation grace periods, and even generate invoice PDFs.

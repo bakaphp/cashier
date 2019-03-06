@@ -55,7 +55,7 @@ build:
           - cd /home/scrutinizer/build
           - composer install --no-interaction
           - composer update --no-interaction
-          - ./vendor/bin/codecept build
+          # - ./vendor/bin/codecept build
 
 #    project_setup:
 #        override: true
