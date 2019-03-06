@@ -655,4 +655,42 @@ trait Billable
         }
         return false;
     }
+
+    /**
+     * Create a new Invoice Item
+     * @param array $data Stripe Invoice Item data
+     */
+    public function createInvoiceItem(array $data)
+    {
+        $invoiceItem = StripeInvoiceItem::create($data, $this->getStripeKey());
+
+        if (is_object($invoiceItem)) {
+            return $invoiceItem;
+        }
+
+        return false;
+    }
+
+    /**
+     * Create and send new Invoice to a customer
+     * @param string $customerId Stripe customer id
+     * @param array $options
+     */
+    public function sendNewInvoice(string $customerId, array $options)
+    {
+        $invoice = StripeInvoice::create([
+            'customer' => $customerId,
+            'billing' => isset($options['billing']) ? $options['billing'] : 'send_invoice',
+            'days_until_due' => isset($options['days_until_due']) ? $options['days_until_due'] : 30,
+        ], $this->getStripeKey());
+
+        if (is_object($invoice)) {
+            //Send invoice email to user
+            if ($invoice->sendInvoice()) {
+                return $invoice;
+            }
+        }
+
+        return false;
+    }
 }
