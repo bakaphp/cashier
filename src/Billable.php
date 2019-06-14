@@ -16,7 +16,7 @@ use Stripe\Error\InvalidRequest as StripeErrorInvalidRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Phalcon\Mvc\Model;
-use Baka\Auth\Models\Apps;
+use Baka\Database\Apps;
 
 trait Billable
 {
@@ -253,7 +253,6 @@ trait Billable
 
             return new Invoice($this, $stripeInvoice);
         } catch (StripeErrorInvalidRequest $e) {
-            //
         }
     }
 
@@ -272,7 +271,6 @@ trait Billable
                         ->all(['limit' => 1000]);
             return new Invoice($this, $stripeInvoice);
         } catch (Exception $e) {
-            //
         }
     }
 
@@ -641,7 +639,7 @@ trait Billable
     }
 
     /**
-     * Update default payment method with new card
+     * Update default payment method with new card.
      * @param string $customerId
      * @param string $token
      * @return StripeCustomer
@@ -657,7 +655,7 @@ trait Billable
     }
 
     /**
-     * Create a new Invoice Item
+     * Create a new Invoice Item.
      * @param array $data Stripe Invoice Item data
      */
     public function createInvoiceItem(array $data)
@@ -672,7 +670,7 @@ trait Billable
     }
 
     /**
-     * Create and send new Invoice to a customer
+     * Create and send new Invoice to a customer.
      * @param string $customerId Stripe customer id
      * @param array $options
      */

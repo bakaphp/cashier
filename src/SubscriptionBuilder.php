@@ -5,7 +5,7 @@ namespace Phalcon\Cashier;
 use Carbon\Carbon;
 use Exception;
 use Phalcon\Mvc\Model;
-use Baka\Auth\Models\Apps;
+use Baka\Database\Apps;
 
 class SubscriptionBuilder
 {
@@ -65,21 +65,21 @@ class SubscriptionBuilder
     protected $metadata;
 
     /**
-     * Company
+     * Company.
      *
      * @var Company
      */
     protected $company;
 
     /**
-     * App
+     * App.
      *
      * @var Apps
      */
     protected $apps;
 
     /**
-     * Active Subscription Id
+     * Active Subscription Id.
      *
      * @var string
      */
