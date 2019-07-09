@@ -44,6 +44,8 @@ build:
     dependencies:
         before:
           - cd /home/scrutinizer/build
+          - cp storage/ci/.env.example .env
+          - cp storage/ci/phinx.php.example phinx.php
           -
             command: 'cd ~/ && rm -rf cphalcon && git clone -b 3.4.x -q --depth=1 https://github.com/phalcon/cphalcon.git && cd cphalcon/build && ./install'
           -
@@ -52,6 +54,10 @@ build:
           - sed -i '$ a \\n[Phalcon]\nextension=phalcon.so\n' /home/scrutinizer/.phpenv/versions/7.2.13/etc/php.ini
           - php -m | grep -i Phalcon
           - sudo /etc/init.d/apache2 restart
+          - beanstalkd -p 11300 &
+          - mysql -e "CREATE DATABASE gonano"
+          - mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('password');"
+          - mysql -e "FLUSH PRIVILEGES"
           - cd /home/scrutinizer/build
           - composer install --no-interaction
           - composer update --no-interaction
