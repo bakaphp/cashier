@@ -6,10 +6,10 @@ return new \Phalcon\Config(
          */
         'database' => [
             'mysql' => [
-                'host' => 'localhost',
+                'host' => 'mysql',
                 'username' => 'root',
                 'password' => getenv('DATABASE_PASSWORD'),
-                'dbname' => 'baka_auth',
+                'dbname' => 'baka',
                 'charset' => 'utf8',
             ]
         ],
