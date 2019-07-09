@@ -13,7 +13,7 @@ class WebhookTest extends \UnitTestCase
      */
     public function testPendingPayment()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $webhook = new WebHookController();
         $payload = [
             'data' => [
@@ -37,7 +37,7 @@ class WebhookTest extends \UnitTestCase
      */
     public function testFailedPayment()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $webhook = new WebHookController();
         $payload = [
             'data' => [
@@ -60,7 +60,7 @@ class WebhookTest extends \UnitTestCase
      */
     public function testSucceededPayment()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $webhook = new WebHookController();
         $payload = [
             'data' => [
@@ -83,7 +83,7 @@ class WebhookTest extends \UnitTestCase
      */
     public function testSubscriptionUpdate()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $webhook = new WebHookController();
         $payload = [
             'data' => [
@@ -106,7 +106,7 @@ class WebhookTest extends \UnitTestCase
      */
     public function testFreeTrialEnding()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $trialEnd = time();
 
         $webhook = new WebHookController();

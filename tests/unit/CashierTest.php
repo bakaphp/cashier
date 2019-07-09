@@ -4,7 +4,7 @@ use Carbon\Carbon;
 use App\Models\Users;
 use Phalcon\Cashier\Subscription;
 use App\Models\Companies;
-use App\Models\Apps;
+use Baka\Database\Apps;
 
 require_once 'UnitTestCase.php';
 
@@ -15,7 +15,7 @@ class CashierTest extends \UnitTestCase
      */
     public function testSubscriptionsCanBeCreatedAndUpdated()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $company = Companies::findFirst(1);
         $apps = Apps::findFirst(1);
 
@@ -51,7 +51,7 @@ class CashierTest extends \UnitTestCase
 
     public function testCreatingSubscriptionWithTrial()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
         $company = Companies::findFirst(1);
         $apps = Apps::findFirst(1);
 
@@ -75,7 +75,7 @@ class CashierTest extends \UnitTestCase
 
     public function testCreatingOneOffInvoices()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
 
         // Create Invoice
         $user->createAsStripeCustomer($this->getTestToken());
@@ -89,7 +89,7 @@ class CashierTest extends \UnitTestCase
 
     public function testRefunds()
     {
-        $user = Users::findFirst(2);
+        $user = Users::findFirst(1);
 
         // Create Invoice
         $user->createAsStripeCustomer($this->getTestToken());
