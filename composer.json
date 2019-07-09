@@ -22,7 +22,7 @@
     "require-dev": {
         "squizlabs/php_codesniffer": "1.*",
         "codeception/codeception": "^2.4",
-        "codeception/verify": "*",
+        "codeception/verify": "*"
     },
     "autoload": {
         "psr-4": {
