@@ -21,10 +21,10 @@ build:
               web_root: 'public'
               host: 'api.baka.ld'
         variables:
-          DATA_API_MYSQL_HOST: "localhost"
+          DATA_API_MYSQL_HOST: "127.0.0.1"
           DATA_API_MYSQL_PASS: "password"
           DATA_API_MYSQL_USER: "root"
-          DATA_API_MYSQL_NAME: "baka_auth"
+          DATA_API_MYSQL_NAME: "baka"
           DATA_API_MEMCACHED_HOST: "127.0.0.1"
           DATA_API_MEMCACHED_PORT: 11211
           DATA_API_MEMCACHED_WEIGHT: 100
@@ -55,7 +55,9 @@ build:
           - cd /home/scrutinizer/build
           - composer install --no-interaction
           - composer update --no-interaction
-          # - ./vendor/bin/codecept build
+          - ./vendor/bin/phinx migrate -e development
+          - ./vendor/bin/phinx seed:run
+          - ./vendor/bin/codecept build
 
 #    project_setup:
 #        override: true
