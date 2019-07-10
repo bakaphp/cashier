@@ -1,10 +1,14 @@
 build:
     root_path: './'
+
+    services:
+      # For available tags, see https://hub.docker.com/_/mariadb/
+      mariadb: 10.4
+
     environment:
         selenium: false
         memcached: true
         elasticsearch: false
-        rabbitmq: false
         postgresql: false
         redis: true
         node: false
@@ -22,9 +26,9 @@ build:
               host: 'api.baka.ld'
         variables:
           DATA_API_MYSQL_HOST: "127.0.0.1"
-          DATA_API_MYSQL_PASS: "password"
+          DATA_API_MYSQL_PASS: ""
           DATA_API_MYSQL_USER: "root"
-          DATA_API_MYSQL_NAME: "baka"
+          DATA_API_MYSQL_NAME: "gonano"
           DATA_API_MEMCACHED_HOST: "127.0.0.1"
           DATA_API_MEMCACHED_PORT: 11211
           DATA_API_MEMCACHED_WEIGHT: 100
@@ -55,7 +59,7 @@ build:
           - php -m | grep -i Phalcon
           - sudo /etc/init.d/apache2 restart
           - beanstalkd -p 11300 &
-          - mysql -e "CREATE DATABASE baka"
+          - mysql -e "CREATE DATABASE gonano"
           - mysql -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('password');"
           - mysql -e "FLUSH PRIVILEGES"
           - cd /home/scrutinizer/build
@@ -85,7 +89,7 @@ filter:
     - 'storage/*'
     - 'vendor/*'
     - 'phinx.php'
-    - 'library/Http/SwooleRequest.php' #it need to be this big , since the phalcon interfase requires it
+    - 'src/Http/SwooleRequest.php' #it need to be this big , since the phalcon interfase requires it
 
 build_failure_conditions:
     # No classes/methods with a rating of D or worse
