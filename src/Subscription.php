@@ -285,8 +285,8 @@ class Subscription extends Model
     public function cancelNow()
     {
         $subscription = $this->asStripeSubscription();
-
-        $subscription->cancel();
+        $subscription->cancel_at_period_end = true;
+        $subscription->save();
 
         $this->markAsCancelled();
 
