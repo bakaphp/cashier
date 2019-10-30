@@ -268,7 +268,7 @@ class Subscription extends Model
     {
         $subscription = $this->asStripeSubscription();
 
-        $subscription->cancel(['at_period_end' => true]);
+        $subscription->cancel(['cancel_at_period_end' => true]);
 
         $this->markAsCancelled();
 
