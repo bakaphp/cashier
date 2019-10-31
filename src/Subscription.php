@@ -267,12 +267,24 @@ class Subscription extends Model
     public function cancel()
     {
         $subscription = $this->asStripeSubscription();
-
-        $subscription->cancel(['cancel_at_period_end' => true]);
+        $subscription->cancel_at_period_end = true;
+        $subscription->save();
 
         $this->markAsCancelled();
 
-        $this->save();
+        return $this;
+    }
+
+    /**
+     * Reactivate the subscription at the end of the billing period.
+     *
+     * @return $this
+     */
+    public function reactivate()
+    {
+        $subscription = $this->asStripeSubscription();
+        $subscription->cancel_at_period_end = false;
+        $subscription->save();
 
         return $this;
     }
@@ -285,8 +297,7 @@ class Subscription extends Model
     public function cancelNow()
     {
         $subscription = $this->asStripeSubscription();
-        $subscription->cancel_at_period_end = true;
-        $subscription->save();
+        $subscription->cancel();
 
         $this->markAsCancelled();
 
