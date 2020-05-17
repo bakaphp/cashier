@@ -9,7 +9,6 @@
             "email": "max@mctekk.com"
         }
     ],
-    "minimum-stability": "stable",
     "require": {
         "php": ">=7.1",
         "dompdf/dompdf": "^0.6.1",
