@@ -2,9 +2,9 @@
 
 namespace Phalcon\Cashier\Traits;
 
-use Phalcon\Http\Response;
-use Exception;
 use Baka\Auth\Models\Users;
+use Exception;
+use Phalcon\Http\Response;
 
 /**
  * Trait WebhookHandlers
@@ -42,7 +42,7 @@ trait StripeWebhookHandlersTrait
         $this->log->info("Payload: {$payloadContent} \n");
 
         if (method_exists($this, $method)) {
-            return $this->{$method}($request);
+            return $this->{$method}($request, $method);
         } else {
             return $this->response(['Missing Method to Handled']);
         }
@@ -119,7 +119,7 @@ trait StripeWebhookHandlersTrait
      * @param  array $payload
      * @return Response
      */
-    protected function handleCustomerSourceDeleted(array $payload, string $method) : Response
+    protected function handleCustomerSourceDeleted(array $payload, string $method): Response
     {
         if ($user = Users::findFirstByStripeId($payload['data']['object']['customer'])) {
             $user->updateCardFromStripe();
@@ -133,7 +133,7 @@ trait StripeWebhookHandlersTrait
      * @param  array $payload
      * @return Response
      */
-    protected function handleCustomerDeleted(array $payload, string $method) : Response
+    protected function handleCustomerDeleted(array $payload, string $method): Response
     {
         $user = Users::findFirstByStripeId($payload['data']['object']['id']);
         if ($user) {
@@ -174,7 +174,7 @@ trait StripeWebhookHandlersTrait
      * @param array $payload
      * @return Response
      */
-    protected function handleChargeFailed(array $payload, string $method) : Response
+    protected function handleChargeFailed(array $payload, string $method): Response
     {
         $user = Users::findFirstByStripeId($payload['data']['object']['customer']);
         if ($user) {
@@ -191,7 +191,7 @@ trait StripeWebhookHandlersTrait
      * @param array $payload
      * @return Response
      */
-    protected function handleChargeDisputeCreated(array $payload, string $method) : Response
+    protected function handleChargeDisputeCreated(array $payload, string $method): Response
     {
         return $this->response(['Webhook Handled']);
     }
@@ -203,7 +203,7 @@ trait StripeWebhookHandlersTrait
      * @param array $payload
      * @return Response
      */
-    protected function handleChargePending(array $payload, string $method) : Response
+    protected function handleChargePending(array $payload, string $method): Response
     {
         $user = Users::findFirstByStripeId($payload['data']['object']['customer']);
         if ($user) {
